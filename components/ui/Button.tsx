@@ -3,11 +3,17 @@ interface ButtonProps {
   variant: "primary" | "secondary";
 }
 
-export default function Button({ children }: ButtonProps) {
+export default function Button({ children, variant }: ButtonProps) {
   return (
     <button
       type="button"
-      className="min-w-60 h-10 bg-action rounded-xl text-white hover:cursor-pointer hover:bg-action-hover"
+      className={`w-full h-10 rounded-xl ${
+        variant === "primary"
+          ? "bg-action text-white hover:bg-action-hover"
+          : variant === "secondary"
+          ? "bg-white text-action border-action border hover:bg-action hover:text-white"
+          : null
+      }  hover:cursor-pointer `}
     >
       {children}
     </button>
