@@ -5,6 +5,15 @@
   --foreground: #171717;
 }
 
+@theme {
+  /* Simple custom colors */
+  --color-action: #4092f6;
+  --color-action-hover: #7bb6ff;
+
+  /* Font families */
+  --font-family-sans: "Inter", system-ui, sans-serif;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -14,5 +23,4 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
