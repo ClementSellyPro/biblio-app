@@ -1,12 +1,24 @@
-export default function SignUpForm() {
+"use client";
+
+import { useState } from "react";
+
+interface SignUpFormProps {
+  onSubmitData?: { name: string; email: string; password: string };
+}
+
+export default function SignUpForm({ onSubmitData }: SignUpFormProps) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
-    <form className="flex flex-col items-center gap-4 w-10/12 md:8/12 xl:w-6/12">
+    <form className="flex flex-col items-center gap-4 w-10/12 md:6/12 xl:w-8/12">
       <div className="flex flex-col gap-1 w-full">
         <label className="text-sm" id="email">
           Adresse e-mail:
         </label>
         <input
-          className="p-2! bg-white border rounded-sm"
+          className="p-2! bg-white border rounded-sm outline-none focus:border-violet-500"
           type="email"
           name="email"
           required
@@ -17,7 +29,7 @@ export default function SignUpForm() {
           Mot de passe:
         </label>
         <input
-          className="p-2! bg-white border rounded-sm"
+          className="p-2! bg-white border rounded-sm outline-none focus:border-violet-500"
           type="password"
           name="password"
           minLength={8}
@@ -29,7 +41,7 @@ export default function SignUpForm() {
           Nom de profile:
         </label>
         <input
-          className="p-2! bg-white border rounded-sm"
+          className="p-2! bg-white border rounded-sm outline-none focus:border-violet-500"
           type="text"
           name="name"
           minLength={3}
