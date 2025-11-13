@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - represents registered users
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String   
+  bio       String?  @db.Text 
+  status    String?  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User's posts
+  posts Post[]
+
+  // Posts the user has liked
+  likedPosts Like[]
+
+  // Posts the user has saved
+  savedPosts SavedPost[]
+
+  // Comments made by the user
+  comments Comment[]
+
+  // Followers - users who follow this user (readers)
+  followers Follow[] @relation("UserFollowers")
+
+  // Following - users this user follows
+  following Follow[] @relation("UserFollowing")
+
+  @@map("users")
+}
+
+// Post model - represents a book review/post
+model Post {
+  id        String   @id @default(cuid())
+  title     String   
+  score     Int      
+  image     String?  
+  content   String   @db.Text 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Author of the post
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Likes on this post
+  likes Like[]
+
+  // Users who saved this post
+  savedBy SavedPost[]
+
+  // Comments on this post
+  comments Comment[]
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+// Like model - represents a user liking a post
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // User who liked
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Post that was liked
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // A user can only like a post once
+  @@index([userId])
+  @@index([postId])
+  @@map("likes")
+}
+
+// SavedPost model - represents a user saving a post
+model SavedPost {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // User who saved
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Post that was saved
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // A user can only save a post once
+  @@index([userId])
+  @@index([postId])
+  @@map("saved_posts")
+}
+
+// Comment model - represents a comment on a post
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User who commented
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Post that was commented on
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([postId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+// Follow model - represents a follow relationship between users
+model Follow {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // User who is following (the "reader")
+  followerId String
+  follower   User   @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+
+  // User being followed
+  followingId String
+  following   User    @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId]) // A user can only follow another user once
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
