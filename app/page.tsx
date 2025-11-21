@@ -15,7 +15,7 @@ export default function Home() {
             height={700}
           />
         </div>
-        <div className="relative flex flex-col justify-center items-center h-screen w-full md:w-6/12 gap-9">
+        <div className="relative flex flex-col justify-center items-center h-screen w-full md:w-6/12 gap-4">
           <Image src={"/icon/logo.svg"} alt="Logo" width={130} height={130} />
           <div className="text-3xl font-light text-center leading-8 bg-linear-to-b from-sky-400 to-violet-500 bg-clip-text text-transparent">
             <p>
@@ -28,7 +28,7 @@ export default function Home() {
 
           <SignUpForm />
 
-          <p className="absolute bottom-12 mt-8!">
+          <p className="absolute bottom-8 mt-8!">
             Deja un compte ?{" "}
             <Link href={"/login"} className="text-action font-semibold">
               Se connecter

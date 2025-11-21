@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { config } from "dotenv";
+import { resolve } from "path";
 
 if (process.env.NODE_ENV !== "production") {
-  import("dotenv").then((dotenv) => dotenv.config());
+  config({ path: resolve(process.cwd(), ".env") });
 }
 
 const globalForPrisma = globalThis as unknown as {
