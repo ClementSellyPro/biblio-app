@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
-import AuthLayout from "./AuthLayout";
+import AuthFormLayout from "./AuthFormLayout";
 
 interface SignUpFormProps {
   onSubmitData?: { name: string; email: string; password: string };
@@ -16,7 +16,7 @@ export default function SignUpForm({ onSubmitData }: SignUpFormProps) {
 
   return (
     <div className="w-10/12 md:6/12 xl:w-6/12">
-      <AuthLayout />
+      <AuthFormLayout />
 
       <div className="relative before:absolute before:w-full before:h-8 text-center py-4!">
         <span>ou</span>

@@ -1,4 +1,4 @@
-export default function AuthLayout() {
+export default function AuthFormLayout() {
   return (
     <form className="flex flex-col items-center gap-4">
       <input
