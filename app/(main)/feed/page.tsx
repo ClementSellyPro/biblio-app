@@ -1,7 +1,9 @@
+import PostCard from "./_components/PostCard";
+
 export default function FeedPage() {
   return (
     <div>
-      <p>Feed Page</p>
+      <PostCard />
     </div>
   );
 }
