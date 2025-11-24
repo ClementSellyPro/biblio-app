@@ -4,6 +4,8 @@ export default function FeedPage() {
   return (
     <div>
       <PostCard />
+      <PostCard />
+      <PostCard />
     </div>
   );
 }

@@ -1,13 +1,28 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 export default function PostCardFooter() {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  function onLike() {
+    setIsLiked((prev) => !prev);
+  }
+
+  function onBookmarked() {
+    setIsBookmarked((prev) => !prev);
+  }
+
   return (
     <div className="p-3!">
       {/* Icon interactions section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Image
-            src={"/icon/like_empty.svg"}
+            onClick={onLike}
+            src={`/icon/like${isLiked ? "" : "_empty"}.svg`}
             alt="Like"
             width={25}
             height={25}
@@ -20,7 +35,8 @@ export default function PostCardFooter() {
           />
         </div>
         <Image
-          src={"/icon/bookmark_empty.svg"}
+          onClick={onBookmarked}
+          src={`/icon/bookmark${isBookmarked ? "" : "_empty"}.svg`}
           alt="Comment"
           width={18}
           height={20}
