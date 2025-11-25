@@ -1,6 +1,11 @@
+"use client";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/search")) return null;
+
   return (
     <div className="relative flex justify-center items-center h-14">
       <Image
