@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function AuthFormLayout() {
   const router = useRouter();
+  const pathname = usePathname();
+  console.log(pathname);
   const [formData, setFormData] = useState({
     email: "",
     name: "",
@@ -98,7 +100,7 @@ export default function AuthFormLayout() {
         type="submit"
         className="bg-action hover:bg-blue-400 active:bg-action hover:cursor-pointer text-white rounded-full w-fit py-2! px-14! mt-4!"
       >
-        S&apos;inscrire
+        {pathname === "/login" ? "Se connecter" : "S'inscrire"}
         {loading ? "..." : null}
       </button>
     </form>
