@@ -1,68 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { FormEvent } from "react";
+import { Dispatch, SetStateAction } from "react";
+import Button from "../ui/Button";
 
-export default function AuthFormLayout() {
-  const router = useRouter();
+interface FormDataType {
+  email: string;
+  name: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface AuthFormType {
+  handleSubmit: (e: FormEvent) => Promise<void>;
+  formData: FormDataType;
+  setFormData: Dispatch<SetStateAction<FormDataType>>;
+  error?: string;
+  loading?: boolean;
+}
+
+export default function AuthFormLayout({
+  handleSubmit,
+  formData,
+  setFormData,
+  error,
+  loading,
+}: AuthFormType) {
   const pathname = usePathname();
-  console.log(pathname);
-  const [formData, setFormData] = useState({
-    email: "",
-    name: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          name: formData.name,
-          password: formData.password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Une erreur est survenue");
-        setLoading(false);
-        return;
-      }
-
-      // Connecter automatiquement l'utilisateur
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Compte créé mais erreur de connexion");
-        router.push("/login");
-      } else {
-        router.push("/feed");
-      }
-      //eslint-disable-next-line
-    } catch (error) {
-      setError("Une erreur est survenue");
-      setLoading(false);
-    }
-  };
 
   return (
-    <form className="flex flex-col items-center gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
       <input
         placeholder="Adresse e-mail"
         className="p-2! w-full bg-white border border-gray-500 rounded-sm outline-none focus:border-violet-500"
@@ -95,14 +63,10 @@ export default function AuthFormLayout() {
 
       {error !== "" ? <p className="text-red-500">{error}</p> : null}
 
-      <button
-        onClick={handleSubmit}
-        type="submit"
-        className="bg-action hover:bg-blue-400 active:bg-action hover:cursor-pointer text-white rounded-full w-fit py-2! px-14! mt-4!"
-      >
+      <Button variant="primary" submit>
         {pathname === "/login" ? "Se connecter" : "S'inscrire"}
         {loading ? "..." : null}
-      </button>
+      </Button>
     </form>
   );
 }

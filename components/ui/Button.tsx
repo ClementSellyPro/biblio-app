@@ -1,12 +1,13 @@
 interface ButtonProps {
   children: React.ReactNode;
   variant: "primary" | "secondary";
+  submit?: boolean;
 }
 
-export default function Button({ children, variant }: ButtonProps) {
+export default function Button({ children, variant, submit }: ButtonProps) {
   return (
     <button
-      type="button"
+      type={submit ? "submit" : "button"}
       className={`w-full h-10 rounded-xl ${
         variant === "primary"
           ? "bg-action text-white hover:bg-action-hover"
