@@ -14,27 +14,32 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
       onClick={() => onToggleModal(false)}
     >
       <div
-        className="bg-white w-7/8 md:w-1/2 min-h-1/2 rounded-xl p-4!"
+        className="bg-white w-7/8 md:w-1/2 min-h-1/2 max-h-2/3 overflow-scroll rounded-xl p-4!"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-center text-4xl font-extralight">NOUVEAU POST</h2>
 
         <form className="flex flex-col gap-4 mt-8!">
           <div>
-            <label>Titre:</label>
-            <input
-              className="pl-2! border w-full h-10 text-lg rounded-md outline-none focus:border-action focus:border-2"
-              type="text"
-              placeholder="Titre du post"
-            />
+            <label>Recherche le livre:</label>
+            <div className="flex items-center gap-2">
+              <input
+                className="pl-2! border w-full h-10 text-lg rounded-md outline-none focus:border-action focus:border-2"
+                type="text"
+                placeholder="Titre du livre"
+              />
+              <div className="w-1/2">
+                <Button variant="secondary">Rechercher</Button>
+              </div>
+            </div>
           </div>
 
           <div>
             <label>Description:</label>
             <textarea
-              className="pl-2! border w-full h-10 text-lg rounded-md resize-none outline-none focus:border-action focus:border-2"
-              rows={8}
-              placeholder="Ajouter une description"
+              className="pl-2! border w-full text-lg rounded-md resize-none outline-none focus:border-action focus:border-2"
+              rows={5}
+              placeholder="Ajouter une description, un avis"
             />
           </div>
 
