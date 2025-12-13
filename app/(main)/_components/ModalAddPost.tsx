@@ -11,23 +11,31 @@ interface ModalAddPostType {
 export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Book[]>([]);
+  const [selectedBook, setSelectedBook] = useState<Book>();
+  const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSearchBook() {
     setLoading(true);
+    setIsSearching(true);
 
     try {
       const res = await fetch(
         `/api/books/search?q=${encodeURIComponent(query)}`
       );
       const data = await res.json();
-      console.log(data.items);
+
       setResults(data.items || []);
     } catch (error) {
       console.error("Erreur pendant recherche de livres: ", error);
     } finally {
       setLoading(false);
     }
+  }
+
+  function onSelectBook(book: Book) {
+    setSelectedBook(book);
+    setIsSearching(false);
   }
 
   return (
@@ -50,7 +58,7 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
                 type="text"
                 placeholder="Titre du livre"
                 onChange={(e) => setQuery(e.target.value)}
-                value={query}
+                value={selectedBook?.volumeInfo.title ?? query}
               />
               <div className="w-1/2">
                 <div onClick={onSearchBook}>
@@ -58,19 +66,29 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
                 </div>
               </div>
 
-              <div className="absolute left-0 top-12 w-full min-h-44 px-4! py-2! border rounded-lg bg-white">
-                <p>Resultats de votre recherche:</p>
+              {isSearching && (
+                <div className="absolute left-0 top-12 w-full min-h-44 max-h-72 overflow-scroll px-4! py-2! border rounded-lg bg-white">
+                  <p className="font-semibold mb-4!">
+                    Resultats de votre recherche:
+                  </p>
 
-                <ul>
-                  {loading && "Recherche en cours..."}
+                  <ul className="flex flex-col gap-2">
+                    {loading && "Recherche en cours..."}
 
-                  {results.length > 0
-                    ? results.map((book) => (
-                        <li key={book.id}>{book.volumeInfo.title}</li>
-                      ))
-                    : null}
-                </ul>
-              </div>
+                    {results.length > 0
+                      ? results.map((book) => (
+                          <li
+                            className="border-b py-2! hover:border-b-2 hover:font-semibold cursor-pointer"
+                            key={book.id}
+                            onClick={() => onSelectBook(book)}
+                          >
+                            {book.volumeInfo.title}
+                          </li>
+                        ))
+                      : null}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
