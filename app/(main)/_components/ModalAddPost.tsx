@@ -3,6 +3,7 @@
 import Button from "@/components/ui/Button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Book } from "@/app/models/BookType";
+import { PostRequest } from "@/app/models/PostRequest";
 
 interface ModalAddPostType {
   onToggleModal: Dispatch<SetStateAction<boolean>>;
@@ -11,9 +12,13 @@ interface ModalAddPostType {
 export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Book[]>([]);
-  const [selectedBook, setSelectedBook] = useState<Book>();
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState<PostRequest>({
+    book: null,
+    comment: "",
+    note: 1,
+  });
 
   async function onSearchBook() {
     setLoading(true);
@@ -34,8 +39,13 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
   }
 
   function onSelectBook(book: Book) {
-    setSelectedBook(book);
+    setForm((prev) => ({ ...prev, book: book }));
     setIsSearching(false);
+  }
+
+  function onSubmitPost(e: React.FormEvent) {
+    e.preventDefault();
+    console.log(form);
   }
 
   return (
@@ -49,7 +59,7 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
       >
         <h2 className="text-center text-4xl font-extralight">NOUVEAU POST</h2>
 
-        <form className="flex flex-col gap-4 mt-8!">
+        <form onSubmit={onSubmitPost} className="flex flex-col gap-4 mt-8!">
           <div>
             <label>Recherche le livre:</label>
             <div className="relative flex items-center gap-2">
@@ -58,7 +68,7 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
                 type="text"
                 placeholder="Titre du livre"
                 onChange={(e) => setQuery(e.target.value)}
-                value={selectedBook?.volumeInfo.title ?? query}
+                value={form?.book?.volumeInfo.title ?? query}
               />
               <div className="w-1/2">
                 <div onClick={onSearchBook}>
@@ -98,12 +108,21 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
               className="pl-2! border w-full text-lg rounded-md resize-none outline-none focus:border-action focus:border-2"
               rows={5}
               placeholder="Ajouter une description, un avis"
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, comment: e.target.value }))
+              }
             />
           </div>
 
           <div className="flex flex-col">
             <label htmlFor="note">Note:</label>
-            <select id="note" className="border w-full h-10 rounded-md pl-2!">
+            <select
+              id="note"
+              className="border w-full h-10 rounded-md pl-2!"
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, note: Number(e.target.value) }))
+              }
+            >
               <option>--Choisissez une note--</option>
               <option>1</option>
               <option>2</option>
