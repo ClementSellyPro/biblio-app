@@ -3,7 +3,17 @@
 import Image from "next/image";
 import { useState } from "react";
 
-export default function PostCardFooter() {
+interface PostCardFooterType {
+  title: string;
+  comment: string;
+  note: number;
+}
+
+export default function PostCardFooter({
+  title,
+  comment,
+  note,
+}: PostCardFooterType) {
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -45,13 +55,12 @@ export default function PostCardFooter() {
 
       <div className="py-2!">
         <p className="text-sm">
-          <span className="font-bold">BOOK NAME:</span> This is a good book...
-          to fall asleep !! Booooriiing xD
+          <span className="font-bold">{title}:</span> {comment}
         </p>
       </div>
 
       <div>
-        <p className="text-end font-bold">Note: 2/10</p>
+        <p className="text-end font-bold">Note: {note}/5</p>
       </div>
     </div>
   );
