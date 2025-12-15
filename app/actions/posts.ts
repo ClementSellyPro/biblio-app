@@ -9,8 +9,6 @@ export async function createPost(data: PostRequest) {
   try {
     const session = await auth();
 
-    console.log("Session dans createPost:", session);
-
     if (!session?.user?.id) {
       return {
         success: false,
@@ -20,18 +18,11 @@ export async function createPost(data: PostRequest) {
 
     const { book, comment, note } = data;
 
-    // Validation
+    // Validations
     if (!book?.title) {
       return {
         success: false,
         error: "Livre manquant",
-      };
-    }
-
-    if (!comment?.trim()) {
-      return {
-        success: false,
-        error: "Commentaire requis",
       };
     }
 
@@ -63,7 +54,7 @@ export async function createPost(data: PostRequest) {
     });
 
     // Revalider la page d'accueil
-    revalidatePath("/");
+    revalidatePath("/feed");
 
     return {
       success: true,
