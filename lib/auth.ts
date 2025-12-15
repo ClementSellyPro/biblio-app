@@ -1,7 +1,9 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import authConfig from "./auth.config";
+import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -9,10 +11,51 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
   },
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string },
+        });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        };
+      },
+    }),
+  ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Lors de la connexion Google, créer un name depuis le profil
-      if (account?.provider === "google" && profile?.name) {
+      if (account?.provider === "google" && profile?.name && user.email) {
         const baseName = profile.name
           .toLowerCase()
           .replace(/\s+/g, "_")
@@ -21,21 +64,23 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         let name = baseName;
         let counter = 1;
 
-        // Vérifier l'unicité
         while (await prisma.user.findUnique({ where: { name } })) {
           name = `${baseName}${counter}`;
           counter++;
         }
 
-        // Si l'utilisateur existe déjà, mettre à jour le name
-        if (user.email) {
-          await prisma.user.update({
-            where: { email: user.email },
-            data: { name },
-          });
-        }
+        await prisma.user.update({
+          where: { email: user.email },
+          data: { name },
+        });
       }
       return true;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
     },
     async session({ session, token }) {
       if (session.user && token.sub) {
@@ -44,5 +89,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return session;
     },
   },
-  ...authConfig,
+  trustHost: true,
 });

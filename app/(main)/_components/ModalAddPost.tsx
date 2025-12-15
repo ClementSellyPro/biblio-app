@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Book } from "@/app/models/BookType";
 import { PostRequest } from "@/app/models/PostRequest";
+import { createPost } from "@/app/actions/posts";
 
 interface ModalAddPostType {
   onToggleModal: Dispatch<SetStateAction<boolean>>;
@@ -21,6 +22,8 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
   });
 
   async function onSearchBook() {
+    if (!query.trim()) return;
+
     setLoading(true);
     setIsSearching(true);
 
@@ -28,6 +31,11 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
       const res = await fetch(
         `/api/books/search?q=${encodeURIComponent(query)}`
       );
+
+      if (!res.ok) {
+        throw new Error("Erreur lors de la recherche");
+      }
+
       const data = await res.json();
 
       setResults(data.items || []);
@@ -39,13 +47,35 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
   }
 
   function onSelectBook(book: Book) {
-    setForm((prev) => ({ ...prev, book: book }));
+    setForm((prev) => ({
+      ...prev,
+      book: {
+        title: book.volumeInfo.title,
+        thumbnail: book.volumeInfo.imageLinks?.thumbnail ?? null,
+        googleId: book.id,
+      },
+    }));
+
+    // reset everything after book selection
     setIsSearching(false);
+    setQuery("");
+    setResults([]);
   }
 
-  function onSubmitPost(e: React.FormEvent) {
+  async function onSubmitPost(e: React.FormEvent) {
     e.preventDefault();
-    console.log(form);
+
+    try {
+      const result = await createPost(form);
+
+      if (!result.success) {
+        throw new Error("Erreur lors de la creation du post.");
+      }
+
+      onToggleModal(false);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout d'un nouveau post: ", error);
+    }
   }
 
   return (
@@ -68,7 +98,7 @@ export default function ModalAddPost({ onToggleModal }: ModalAddPostType) {
                 type="text"
                 placeholder="Titre du livre"
                 onChange={(e) => setQuery(e.target.value)}
-                value={form?.book?.volumeInfo.title ?? query}
+                value={form?.book?.title ?? query}
               />
               <div className="w-1/2">
                 <div onClick={onSearchBook}>

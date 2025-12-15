@@ -1,7 +1,9 @@
-import { Book } from "./BookType";
-
 export interface PostRequest {
-  book: Book | null;
+  book: {
+    title: string;
+    thumbnail: string | null;
+    googleId: string;
+  } | null;
   comment: string;
   note: number;
 }
