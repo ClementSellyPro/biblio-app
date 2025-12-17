@@ -1,6 +1,11 @@
+import { UserWithPosts } from "@/app/models/UserType";
 import Image from "next/image";
 
-export default function ProfileHeader() {
+interface ProfileHeaderType {
+  user: UserWithPosts | null;
+}
+
+export default function ProfileHeader({ user }: ProfileHeaderType) {
   return (
     <div className="flex flex-col gap-4 p-4!">
       <div className="flex items-center gap-4">
@@ -16,25 +21,27 @@ export default function ProfileHeader() {
         <div className="flex flex-col gap-1 w-full">
           <div>
             <div>
-              <p className="text-sm font-semibold">Magnus Carlsen</p>
-              <p className="text-xs text-gray-500">Chess Reader</p>
+              <p className="text-sm font-semibold"> {user?.name}</p>
+              <p className="text-xs text-gray-500">
+                {user?.status ?? "-------"}
+              </p>
             </div>
           </div>
 
           {/* numbers section */}
           <div className="flex gap-10 text-xs">
             <div className="flex flex-col">
-              <span className="font-bold">3</span>
+              <span className="font-bold">{user?._count.posts}</span>
               <span>publications</span>
             </div>
 
             <div className="flex flex-col">
-              <span className="font-bold">13</span>
+              <span className="font-bold">{user?._count.followers}</span>
               <span>readers</span>
             </div>
 
             <div className="flex flex-col">
-              <span className="font-bold">130</span>
+              <span className="font-bold">{user?._count.following}</span>
               <span>suivi(e)s</span>
             </div>
           </div>
@@ -42,9 +49,7 @@ export default function ProfileHeader() {
       </div>
 
       <div className="text-sm">
-        <p>
-          🌊 <br /> My little bio
-        </p>
+        <p>{user?.bio}</p>
       </div>
 
       <button
