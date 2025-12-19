@@ -65,6 +65,9 @@ export default function UpdateProfileModal({
           <Button variant="primary" submit>
             Enregistrer les modifications
           </Button>
+          <Button variant="secondary" onClick={() => toggleUpdateModal(false)}>
+            Annuler
+          </Button>
         </form>
       </div>
     </div>
