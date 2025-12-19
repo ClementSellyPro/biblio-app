@@ -1,6 +1,9 @@
+"use client";
+
 import { UserWithPosts } from "@/app/models/UserType";
 import Button from "@/components/ui/Button";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useState } from "react";
+import { updateUserProfile } from "@/app/actions/user";
 
 interface UpdateProfileModalType {
   user: UserWithPosts | null;
@@ -15,6 +18,29 @@ export default function UpdateProfileModal({
   const [updatedStatus, setUpdatedStatus] = useState<string | null>(null);
   const [updadatedBio, setUpdatedBio] = useState<string | null>(null);
 
+  async function onSubmitModification(
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> {
+    event.preventDefault();
+
+    const data: { name?: string; bio?: string; status?: string } = {};
+
+    if (updatedName !== null) data.name = updatedName;
+    if (updadatedBio !== null) data.bio = updadatedBio;
+    if (updatedStatus !== null) data.status = updatedStatus;
+
+    try {
+      const result = await updateUserProfile(data);
+      if (result.success) {
+        toggleUpdateModal(false);
+      } else {
+        console.error("Update failed:", result.error);
+      }
+    } catch (err) {
+      console.error("Unexpected error updating profile:", err);
+    }
+  }
+
   return (
     <div
       className="absolute top-0 left-0 flex justify-center items-center p-2! h-screen w-full bg-black/50"
@@ -25,7 +51,10 @@ export default function UpdateProfileModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h1 className="text-2xl text-center p-4!">Modifier votre profile</h1>
-        <form className="flex flex-col gap-4 p-4!">
+        <form
+          onSubmit={onSubmitModification}
+          className="flex flex-col gap-4 p-4!"
+        >
           <div className="flex flex-col">
             <label htmlFor="name" className="text-xl">
               Pseudo:
