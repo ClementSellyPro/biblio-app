@@ -1,13 +1,23 @@
+"use client";
+
 import { UserWithPosts } from "@/app/models/UserType";
 import Image from "next/image";
+import { useState } from "react";
+import UpdateProfileModal from "./UpdateProfileModal";
 
 interface ProfileHeaderType {
   user: UserWithPosts | null;
 }
 
 export default function ProfileHeader({ user }: ProfileHeaderType) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  function toggleUpdateModal() {
+    setIsUpdating(true);
+  }
+
   return (
-    <div className="flex flex-col gap-4 p-4!">
+    <div className="relative flex flex-col gap-4 p-4!">
       <div className="flex items-center gap-4">
         <div>
           <Image
@@ -55,9 +65,14 @@ export default function ProfileHeader({ user }: ProfileHeaderType) {
       <button
         className="py-2! rounded-lg text-sm bg-black hover:opacity-90 hover:cursor-pointer text-white"
         type="button"
+        onClick={toggleUpdateModal}
       >
         Modifier
       </button>
+
+      {isUpdating && (
+        <UpdateProfileModal user={user} toggleUpdateModal={setIsUpdating} />
+      )}
     </div>
   );
 }
