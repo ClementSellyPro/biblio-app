@@ -3,16 +3,18 @@
 import { UserWithPosts } from "@/app/models/UserType";
 import Button from "@/components/ui/Button";
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
-import { updateUserProfile } from "@/app/actions/user";
+import { updateUserProfile, getCurrentUserProfile } from "@/app/actions/user";
 
 interface UpdateProfileModalType {
   user: UserWithPosts | null;
   toggleUpdateModal: Dispatch<SetStateAction<boolean>>;
+  onProfileUpdated?: (user: UserWithPosts) => void;
 }
 
 export default function UpdateProfileModal({
   user,
   toggleUpdateModal,
+  onProfileUpdated,
 }: UpdateProfileModalType) {
   const [updatedName, setUpdatedName] = useState<string | null>(null);
   const [updatedStatus, setUpdatedStatus] = useState<string | null>(null);
@@ -32,7 +34,15 @@ export default function UpdateProfileModal({
     try {
       const result = await updateUserProfile(data);
       if (result.success) {
-        toggleUpdateModal(false);
+        // re-fetch full profile with counts and posts
+        const fresh = await getCurrentUserProfile();
+        if (fresh.success && fresh.user) {
+          if (onProfileUpdated) onProfileUpdated(fresh.user);
+          toggleUpdateModal(false);
+        } else {
+          // fallback: just close modal
+          toggleUpdateModal(false);
+        }
       } else {
         console.error("Update failed:", result.error);
       }

@@ -11,9 +11,15 @@ interface ProfileHeaderType {
 
 export default function ProfileHeader({ user }: ProfileHeaderType) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [localUser, setLocalUser] = useState<UserWithPosts | null>(user);
 
-  function toggleUpdateModal() {
+  function openUpdateModal() {
     setIsUpdating(true);
+  }
+
+  function handleProfileUpdated(updated: UserWithPosts) {
+    setLocalUser(updated);
+    setIsUpdating(false);
   }
 
   return (
@@ -31,9 +37,9 @@ export default function ProfileHeader({ user }: ProfileHeaderType) {
         <div className="flex flex-col gap-1 w-full">
           <div>
             <div>
-              <p className="text-sm font-semibold"> {user?.name}</p>
+              <p className="text-sm font-semibold"> {localUser?.name}</p>
               <p className="text-xs text-gray-500">
-                {user?.status ?? "-------"}
+                {localUser?.status ?? "-------"}
               </p>
             </div>
           </div>
@@ -41,17 +47,17 @@ export default function ProfileHeader({ user }: ProfileHeaderType) {
           {/* numbers section */}
           <div className="flex gap-10 text-xs">
             <div className="flex flex-col">
-              <span className="font-bold">{user?._count.posts}</span>
+              <span className="font-bold">{localUser?._count.posts}</span>
               <span>publications</span>
             </div>
 
             <div className="flex flex-col">
-              <span className="font-bold">{user?._count.followers}</span>
+              <span className="font-bold">{localUser?._count.followers}</span>
               <span>readers</span>
             </div>
 
             <div className="flex flex-col">
-              <span className="font-bold">{user?._count.following}</span>
+              <span className="font-bold">{localUser?._count.following}</span>
               <span>suivi(e)s</span>
             </div>
           </div>
@@ -59,19 +65,23 @@ export default function ProfileHeader({ user }: ProfileHeaderType) {
       </div>
 
       <div className="text-sm">
-        <p>{user?.bio}</p>
+        <p>{localUser?.bio}</p>
       </div>
 
       <button
         className="py-2! rounded-lg text-sm bg-black hover:opacity-90 hover:cursor-pointer text-white"
         type="button"
-        onClick={toggleUpdateModal}
+        onClick={openUpdateModal}
       >
         Modifier
       </button>
 
       {isUpdating && (
-        <UpdateProfileModal user={user} toggleUpdateModal={setIsUpdating} />
+        <UpdateProfileModal
+          user={localUser}
+          toggleUpdateModal={setIsUpdating}
+          onProfileUpdated={handleProfileUpdated}
+        />
       )}
     </div>
   );
